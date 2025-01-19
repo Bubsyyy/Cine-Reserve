@@ -1,6 +1,7 @@
 package org.example.cineReserve.reservation.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.example.cineReserve.seat.model.Seat;
 import org.example.cineReserve.showtime.model.Showtime;
 import org.example.cineReserve.user.model.User;
@@ -10,6 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "reservations")
 public class Reservation {

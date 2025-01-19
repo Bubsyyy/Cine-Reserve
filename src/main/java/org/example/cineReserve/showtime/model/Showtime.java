@@ -1,6 +1,7 @@
 package org.example.cineReserve.showtime.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.example.cineReserve.movie.model.Movie;
 import org.example.cineReserve.reservation.model.Reservation;
 import org.example.cineReserve.screen.model.Screen;
@@ -11,6 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "showtimes")
 public class Showtime {
