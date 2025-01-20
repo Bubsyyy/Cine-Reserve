@@ -63,4 +63,14 @@ public class ScreenService {
         return user.getRole() == UserRole.ADMIN;
 
     }
+
+    public Screen getScreenByName(String screenName) {
+
+        Optional<Screen> optionalScreen = screenRepository.findByName(screenName);
+        if (optionalScreen.isPresent()) {
+            return optionalScreen.get();
+        }
+
+        throw new DomainException("Screen with that name does not exist.");
+    }
 }

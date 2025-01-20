@@ -60,6 +60,15 @@ public class MovieService {
 
     }
 
+    public Movie getMovieByTitle(String title) {
+        Optional<Movie> optionalMovie = movieRepository.findByTitle(title);
+        if(optionalMovie == null){
+            throw new DomainException("There is no movie with title [%s]".formatted(title));
+        }
+
+        return optionalMovie.get();
+    }
+
     private boolean isUserAdmin(User user) {
 
         return user.getRole() == UserRole.ADMIN;
