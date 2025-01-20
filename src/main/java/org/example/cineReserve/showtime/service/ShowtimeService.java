@@ -43,7 +43,7 @@ public class ShowtimeService {
 
         }
 
-        if(screenIsProjecting(showtimeAddRequest)){
+        if(isShowtimeBeingProjected(showtimeAddRequest)){
             throw new DomainException("There is already a showtime in this screen for this time.");
         }
 
@@ -65,7 +65,7 @@ public class ShowtimeService {
 
     }
 
-    private boolean screenIsProjecting(ShowtimeAddRequest showtimeAddRequest) {
+    private boolean isShowtimeBeingProjected(ShowtimeAddRequest showtimeAddRequest) {
 
         Screen screen = screenService.getScreenByName(showtimeAddRequest.getScreenName());
 
