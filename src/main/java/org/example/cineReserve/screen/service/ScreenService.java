@@ -8,26 +8,33 @@ import org.example.cineReserve.screen.model.Screen;
 import org.example.cineReserve.screen.repository.ScreenRepository;
 import org.example.cineReserve.user.model.User;
 import org.example.cineReserve.user.model.UserRole;
+import org.example.cineReserve.user.repository.UserRepository;
+import org.example.cineReserve.user.service.UserService;
 import org.example.cineReserve.web.dto.ScreenAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
 public class ScreenService {
 
+    private final UserService userService;
     private final ScreenRepository screenRepository;
 
     @Autowired
-    public ScreenService(ScreenRepository screenRepository) {
+    public ScreenService(ScreenRepository screenRepository, UserService userService) {
         this.screenRepository = screenRepository;
+        this.userService = userService;
     }
 
 
-    public void addScreen(User user, ScreenAddRequest screenAddRequest) {
+    public void addScreen(UUID userId, ScreenAddRequest screenAddRequest) {
+
+        User user = userService.getUserById(userId);
 
         if (!isUserAdmin(user)){
 

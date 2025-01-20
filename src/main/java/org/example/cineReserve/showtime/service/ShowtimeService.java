@@ -6,17 +6,21 @@ import org.example.cineReserve.movie.model.Movie;
 import org.example.cineReserve.movie.service.MovieService;
 import org.example.cineReserve.screen.model.Screen;
 import org.example.cineReserve.screen.service.ScreenService;
+import org.example.cineReserve.seat.service.SeatService;
 import org.example.cineReserve.showtime.model.Showtime;
 import org.example.cineReserve.showtime.repository.ShowtimeRepository;
 import org.example.cineReserve.user.model.User;
 import org.example.cineReserve.user.model.UserRole;
+import org.example.cineReserve.user.service.UserService;
 import org.example.cineReserve.web.dto.ShowtimeAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -27,15 +31,23 @@ public class ShowtimeService {
     private final ShowtimeRepository showtimeRepository;
     private final ScreenService screenService;
     private final MovieService movieService;
+    private final SeatService seatService;
+    private final UserService userService;
 
     @Autowired
-    public ShowtimeService(ShowtimeRepository showtimeRepository, ScreenService screenService, MovieService movieService) {
+    public ShowtimeService(ShowtimeRepository showtimeRepository, ScreenService screenService, MovieService movieService, SeatService seatService, UserService userService) {
         this.showtimeRepository = showtimeRepository;
         this.screenService = screenService;
         this.movieService = movieService;
+        this.seatService = seatService;
+        this.userService = userService;
     }
 
-    public void addShowtime(User user, ShowtimeAddRequest showtimeAddRequest){
+
+    @Transactional
+    public void addShowtime(UUID userId, ShowtimeAddRequest showtimeAddRequest){
+
+        User user = userService.getUserById(userId);
 
         if (!isUserAdmin(user)){
 
@@ -49,13 +61,24 @@ public class ShowtimeService {
 
         Movie movieForShowtime = movieService.getMovieByTitle(showtimeAddRequest.getMovieTitle());
         Screen screenForShowtime = screenService.getScreenByName(showtimeAddRequest.getScreenName());
+        LocalDateTime startTime = showtimeAddRequest.getStartTime();
         int movieHours = movieForShowtime.getDurationInMinutes() / 60;
         int movieMinutes = movieForShowtime.getDurationInMinutes() % 60;
 
-        LocalDateTime endTime = showtimeAddRequest.getStartTime().plusHours(movieHours).plusMinutes(movieMinutes);
+        LocalDateTime endTime = startTime.plusHours(movieHours).plusMinutes(movieMinutes);
 
-        //TODO save and initialize seats
+        
 
+        Showtime showtime = Showtime.builder()
+                .movie(movieForShowtime)
+                .startTime(startTime)
+                .endTime(endTime)
+                .screen(screenForShowtime)
+                .build();
+
+        showtimeRepository.save(showtime);
+
+        seatService.createNewSeats(showtime);
 
     }
 
