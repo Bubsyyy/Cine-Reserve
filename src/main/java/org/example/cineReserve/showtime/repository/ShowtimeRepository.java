@@ -14,13 +14,20 @@ import java.util.UUID;
 public interface ShowtimeRepository extends JpaRepository<Showtime, UUID> {
 
 
+
     @Query(
             value = "SELECT * FROM showtimes " +
                     "WHERE screen_id = :id " +
-                    "AND :givenDate BETWEEN start_time AND end_time",
+                    "AND ((:showtimeStart BETWEEN start_time AND end_time) " +
+                    "OR (:showtimeEnd BETWEEN start_time AND end_time))",
             nativeQuery = true
     )
-    List<Showtime> findByScreenIdAndDateWithinTimeframe(@Param("id") UUID id, @Param("givenDate") LocalDateTime givenDate);
+    List<Showtime> findByScreenIdAndShowtimeRange(
+            @Param("id") UUID id,
+            @Param("showtimeStart") LocalDateTime showtimeStart,
+            @Param("showtimeEnd") LocalDateTime showtimeEnd
+    );
+
 
 
 }

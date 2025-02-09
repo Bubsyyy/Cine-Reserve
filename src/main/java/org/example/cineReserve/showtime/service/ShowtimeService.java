@@ -62,12 +62,8 @@ public class ShowtimeService {
         Movie movieForShowtime = movieService.getMovieByTitle(showtimeAddRequest.getMovieTitle());
         Screen screenForShowtime = screenService.getScreenByName(showtimeAddRequest.getScreenName());
         LocalDateTime startTime = showtimeAddRequest.getStartTime();
-        int movieHours = movieForShowtime.getDurationInMinutes() / 60;
-        int movieMinutes = movieForShowtime.getDurationInMinutes() % 60;
+        LocalDateTime endTime = calculateShowtimeEnd(showtimeAddRequest);
 
-        LocalDateTime endTime = startTime.plusHours(movieHours).plusMinutes(movieMinutes);
-
-        
 
         Showtime showtime = Showtime.builder()
                 .movie(movieForShowtime)
@@ -93,8 +89,9 @@ public class ShowtimeService {
         Screen screen = screenService.getScreenByName(showtimeAddRequest.getScreenName());
 
         LocalDateTime startOfTheShowtime = showtimeAddRequest.getStartTime();
+        LocalDateTime endOfTheShowtime = calculateShowtimeEnd(showtimeAddRequest);
 
-        List<Showtime> showtimesDuringThisPeriod = showtimeRepository.findByScreenIdAndDateWithinTimeframe(screen.getId(), startOfTheShowtime);
+        List<Showtime> showtimesDuringThisPeriod = showtimeRepository.findByScreenIdAndShowtimeRange(screen.getId(), startOfTheShowtime, endOfTheShowtime);
 
         if(showtimesDuringThisPeriod.isEmpty()){
 
@@ -107,5 +104,14 @@ public class ShowtimeService {
         }
 
 
+    }
+
+    private LocalDateTime calculateShowtimeEnd(ShowtimeAddRequest showtimeAddRequest){
+        Movie movieToProject = movieService.getMovieByTitle(showtimeAddRequest.getMovieTitle());
+        LocalDateTime startTime = showtimeAddRequest.getStartTime();
+        int movieHours = movieToProject.getDurationInMinutes() / 60;
+        int movieMinutes = movieToProject.getDurationInMinutes() % 60;
+
+        return startTime.plusHours(movieHours).plusMinutes(movieMinutes);
     }
 }
